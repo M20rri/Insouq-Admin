@@ -18,6 +18,11 @@ import {
 import { Router } from '@angular/router';
 import { UserStorageService } from 'src/app/core/services/user-storage.service';
 import { CONSTANTS } from 'src/app/shared/constants';
+import { AuthService } from 'src/app/features/auth/auth.service';
+import {
+  PrivillageResponse,
+  TokenResponse,
+} from 'src/app/features/user-management/models/user.model';
 
 @Component({
   selector: 'app-login',
@@ -42,11 +47,29 @@ import { CONSTANTS } from 'src/app/shared/constants';
   ],
 })
 export class LoginComponent {
-  constructor(private router: Router,private userStorageService:UserStorageService) {}
+  constructor(
+    private router: Router,
+    private userStorageService: UserStorageService,
+    private _auth: AuthService
+  ) {}
 
   onLogin = () => {
     console.log('login');
-    this.userStorageService.set(CONSTANTS.TOKEN,"test token value from backend")
-    this.router.navigateByUrl("/dashboard");
+    let model = {
+      emailOrPhone: '01068011702',
+      password: 'fl@!r$2k',
+    };
+    this._auth.authenticate(model).subscribe((res: TokenResponse) => {
+      this.userStorageService.set(CONSTANTS.TOKEN, res.accessToken);
+      this._auth
+        .roleAuthenticate()
+        .subscribe((roleResponse: Array<PrivillageResponse>) => {
+          this.userStorageService.set(
+            CONSTANTS.ROLEBASEDAUTHURIZATION,
+            JSON.stringify(roleResponse)
+          );
+        });
+      this.router.navigateByUrl('/dashboard');
+    });
   };
 }
