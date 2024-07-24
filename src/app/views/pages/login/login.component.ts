@@ -20,9 +20,11 @@ import { UserStorageService } from 'src/app/core/services/user-storage.service';
 import { CONSTANTS } from 'src/app/shared/constants';
 import { AuthService } from 'src/app/features/auth/auth.service';
 import {
+  AuthenticateRequest,
   PrivillageResponse,
   TokenResponse,
 } from 'src/app/features/user-management/models/user.model';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
@@ -44,22 +46,25 @@ import {
     FormControlDirective,
     ButtonDirective,
     NgStyle,
+    FormsModule,
   ],
 })
 export class LoginComponent {
+  public user: AuthenticateRequest = { emailOrPhone: '', password: '' };
+
   constructor(
     private router: Router,
     private userStorageService: UserStorageService,
     private _auth: AuthService
   ) {}
 
-  onLogin = () => {
+  onSubmit = () => {
     console.log('login');
     let model = {
       emailOrPhone: '01068011702',
       password: 'fl@!r$2k',
     };
-    this._auth.authenticate(model).subscribe((res: TokenResponse) => {
+    this._auth.authenticate(this.user).subscribe((res: TokenResponse) => {
       this.userStorageService.set(CONSTANTS.TOKEN, res.accessToken);
       this._auth
         .roleAuthenticate()

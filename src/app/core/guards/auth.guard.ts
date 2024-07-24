@@ -37,6 +37,8 @@ export class AuthGuard implements CanActivate {
       return false;
     }
 
+    // here i will apply more check for pages
+
     const isExists = accessRoles.some(
       (item: PrivillageResponse) => item.page === currentRoute
     );
@@ -45,7 +47,6 @@ export class AuthGuard implements CanActivate {
       alert('you re not authorize to access this page');
       return false;
     }
-    // here i will apply more check for pages
     return true;
   }
 }
